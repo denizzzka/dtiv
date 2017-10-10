@@ -72,7 +72,7 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
 {
     CharData ret;
     ret.codePoint = codepoint;
-    uint mask = 0x80000000;
+    uint mask = 0x8000_0000; // Most significant bit
     uint fg_count;
     uint bg_count;
 
@@ -174,9 +174,10 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
 
             if (diff < best_diff)
             {
+                best_diff = diff;
+
                 bestChr.codePoint = chr.codePoint;
                 bestChr.pattern = pattern;
-                best_diff = diff;
             }
 
             pattern = ~pattern;
