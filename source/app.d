@@ -50,6 +50,14 @@ struct Color
 
         return this;
     }
+
+    void clamp2byte()
+    {
+        foreach(ref e; arr)
+        {
+            e = e < 0 ? 0 : (e > 255 ? 255 : e);
+        }
+    }
 }
 
 struct CharData
@@ -187,7 +195,7 @@ void main()
 
     IFImage im3 = read_image("test/lena.jpg", ColFmt.RGB);
 
-    Pixel getPixel(IFImage img, int x, int y)
+    const (Pixel) getPixel(in IFImage img, int x, int y)
     {
         const idx = y * img.w + x;
 
@@ -200,10 +208,146 @@ void main()
         return ret;
     }
 
-    Pixel _getPixel(int x, int y)
+    int best_index(int value, in ubyte[] data)
     {
-        return getPixel(im3, x, y);
+        import std.math;
+
+        int best_diff = abs(data[0] - value);
+        int result = 0;
+
+        for (int i = 1; i < data.length; i++)
+            if (abs(data[i] - value) < best_diff)
+                result = i;
+
+        return result;
     }
 
-    auto ttt = getCharData(&_getPixel, 3, 5, 0, 0);
+    import std.ascii: newline;
+    import std.stdio;
+
+    auto sqrt(int i)
+    {
+        import std.conv: to;
+        static import std.math;
+
+        return std.math.sqrt(i.to!float);
+    }
+
+    enum
+    {
+        FLAG_FG = 1,
+        FLAG_BG = 2,
+        FLAG_MODE_256 = 4,
+        FLAG_24BIT = 8,
+        FLAG_NOOPT = 16
+    }
+
+    immutable ubyte[6] COLOR_STEPS = [0, 0x5f, 0x87, 0xaf, 0xd7, 0xff];
+    immutable ubyte[24] GRAYSCALE_STEPS = [
+      0x08, 0x12, 0x1c, 0x26, 0x30, 0x3a, 0x44, 0x4e, 0x58, 0x62, 0x6c, 0x76,
+      0x80, 0x8a, 0x94, 0x9e, 0xa8, 0xb2, 0xbc, 0xc6, 0xd0, 0xda, 0xe4, 0xee];
+
+    void emit_color(int flags, Color color)
+    {
+        color.clamp2byte();
+
+        bool bg = (flags & FLAG_BG) != 0;
+
+        if ((flags & FLAG_MODE_256) == 0)
+        {
+            write((bg ? "\x1b[48;2;" : "\x1b[38;2;"), color.r, ';', color.g, ';', color.b, 'm');
+            return;
+        }
+
+        int ri = best_index(color.r, COLOR_STEPS);
+        int gi = best_index(color.g, COLOR_STEPS);
+        int bi = best_index(color.b, COLOR_STEPS);
+
+        int rq = COLOR_STEPS[ri];
+        int gq = COLOR_STEPS[gi];
+        int bq = COLOR_STEPS[bi];
+
+        static import std.math;
+        import std.conv: to;
+        int gray = std.math.round(0.2989f * color.r + 0.5870f * color.g + 0.1140f * color.b).to!int;
+
+        int gri = best_index(gray, GRAYSCALE_STEPS);
+        int grq = GRAYSCALE_STEPS[gri];
+
+        int color_index;
+        if (0.3 * sqrt(rq-color.r) + 0.59 * sqrt(gq-color.g) + 0.11 * sqrt(bq-color.b) <
+        0.3 * sqrt(grq-color.r) + 0.59 * sqrt(grq-color.g) + 0.11 * sqrt(grq-color.b))
+        {
+            color_index = 16 + 36 * ri + 6 * gi + bi;
+        }
+        else
+        {
+            color_index = 232 + gri;  // 1..24 -> 232..255
+        }
+
+        write(bg ? "\x1B[48;5;" : "\u001B[38;5;", color_index, "m");
+    }
+
+    void emitCodepoint(ushort codepoint)
+    {
+        void write(ushort c)
+        {
+            write(cast(char) c);
+        }
+
+        if (codepoint < 128)
+        {
+            codepoint.write;
+        }
+        else if (codepoint < 0x7ff)
+        {
+            ((0xc0 | (codepoint >> 6))).write;
+            (0x80 | (codepoint & 0x3f)).write;
+        }
+        else if (codepoint < 0xffff)
+        {
+            (0xe0 | (codepoint >> 12)).write;
+            (0x80 | ((codepoint >> 6) & 0x3f)).write;
+            (0x80 | (codepoint & 0x3f)).write;
+        }
+        else if (codepoint < 0x10ffff)
+        {
+            (0xf0 | (codepoint >> 18)).write;
+            (0x80 | ((codepoint >> 12) & 0x3f)).write;
+            (0x80 | ((codepoint >> 6) & 0x3f)).write;
+            (0x80 | (codepoint & 0x3f)).write;
+        }
+        else
+        {
+            std.stdio.write("ERROR");
+        }
+    }
+
+    void emit_image(in IFImage image)
+    {
+        const int flags = 0;
+
+        Pixel _getPixel(int x, int y)
+        {
+            return getPixel(image, x, y);
+        }
+
+        for (int y = 0; y < image.h - 8; y += 8)
+        {
+            for (int x = 0; x < image.w - 4; x += 4)
+            {
+                CharData charData = flags & FLAG_NOOPT
+                    ? getCharData(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
+                    : getCharData(&_getPixel, x, y);
+
+                emit_color(flags | FLAG_BG, charData.bgColor);
+                emit_color(flags | FLAG_FG, charData.fgColor);
+                emitCodepoint(charData.codePoint);
+            }
+
+            writeln("\x1b[0m"~newline);
+        }
+    }
+
+    emit_image(im3);
 }
