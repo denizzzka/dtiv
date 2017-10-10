@@ -70,8 +70,8 @@ struct CharData
 /// Return a CharData struct with the given code point and corresponding averag fg and bg colors.
 CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wchar codepoint, uint pattern)
 {
-    CharData result;
-    result.codePoint = codepoint;
+    CharData ret;
+    ret.codePoint = codepoint;
     uint mask = 0x80000000;
     uint fg_count;
     uint bg_count;
@@ -84,12 +84,12 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wcha
 
             if (pattern & mask)
             {
-                avg = result.fgColor;
+                avg = ret.fgColor;
                 fg_count++;
             }
             else
             {
-                avg = result.bgColor;
+                avg = ret.bgColor;
                 bg_count++;
             }
 
@@ -101,12 +101,12 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wcha
 
     // Calculate the average color value for each bucket
     if (bg_count != 0)
-        result.bgColor /= bg_count;
+        ret.bgColor /= bg_count;
 
     if (fg_count != 0)
-        result.fgColor /= fg_count;
+        ret.fgColor /= fg_count;
 
-    return result;
+    return ret;
 }
 
 /// Find the best character and colors for a 4x8 part of the image at the given position
@@ -288,7 +288,7 @@ void main()
 
     void emit_image(in IFImage image)
     {
-        const int flags = 0;
+        const int flags = FLAG_NOOPT;
 
         Pixel _getPixel(int x, int y)
         {
