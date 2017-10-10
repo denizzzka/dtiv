@@ -252,8 +252,8 @@ void main(string[] args)
 {
     import std.stdio;
 
-    //~ auto im3 = IFImgWrapper(args[1]);
-    auto im3 = RawImgWrapper(args[1]);
+    auto im3 = IFImgWrapper(args[1]);
+    //~ auto im3 = RawImgWrapper(args[1]);
 
     const (Pixel) getPixel(T)(in T img, int x, int y)
     {
@@ -338,8 +338,7 @@ void main(string[] args)
 
         static import std.math;
         import std.conv: to;
-        //~ int gray = std.math.round(0.2989f * color.r + 0.5870f * color.g + 0.1140f * color.b).to!int;
-        int gray = std.math.round(color.r * 0.2989f + color.g * 0.5870f + color.b * 0.1140f).to!int;
+        int gray = std.math.round(0.2989f * color.r + 0.5870f * color.g + 0.1140f * color.b).to!int;
 
         int gri = best_index(gray, GRAYSCALE_STEPS);
         int grq = GRAYSCALE_STEPS[gri];
@@ -360,7 +359,7 @@ void main(string[] args)
 
     void emit_image(T)(in T image)
     {
-        const int flags = FLAG_NOT_USE_SKEW;
+        const int flags = 0;
 
         Pixel _getPixel(int x, int y)
         {
