@@ -304,8 +304,8 @@ void main()
                     ? getCharData(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
                     : getCharData(&_getPixel, x, y);
 
-                //~ emit_color(flags | FLAG_BG, charData.bgColor);
-                //~ emit_color(flags | FLAG_FG, charData.fgColor);
+                emit_color(flags | FLAG_BG, charData.bgColor);
+                emit_color(flags | FLAG_FG, charData.fgColor);
                 std.stdio.write(charData.codePoint);
             }
 
