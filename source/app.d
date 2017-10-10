@@ -89,6 +89,36 @@ struct IFImgWrapper
     }
 }
 
+
+struct RawImgWrapper
+{
+    int w = 224;
+    int h = 224;
+    private ubyte[] pixels;
+
+    this(string filename)
+    {
+        import std.file;
+        pixels = cast(ubyte[]) read(filename);
+    }
+
+    Pixel getPixel(int x, int y)
+    {
+        assert (x >= 0);
+        assert (y >= 0);
+
+        const idx = (y * w + x) * Pixel.arr.length;
+
+        assert(idx >= 0);
+        assert(idx < pixels.length);
+
+        Pixel ret;
+        ret.arr = pixels[idx .. idx + Pixel.arr.length];
+
+        return ret;
+    }
+}
+
 struct CharData
 {
     Color fgColor;
@@ -220,7 +250,8 @@ void main(string[] args)
 {
     import std.stdio;
 
-    auto im3 = IFImgWrapper(args[1]);
+    //~ auto im3 = IFImgWrapper(args[1]);
+    auto im3 = RawImgWrapper(args[1]);
 
     const (Pixel) getPixel(T)(in T img, int x, int y)
     {
