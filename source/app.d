@@ -106,7 +106,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wcha
 }
 
 /// Find the best character and colors for a 4x8 part of the image at the given position
-CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0)
+CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0, int y0)
 {
     Color min = {255, 255, 255};
     Color max = {0, 0, 0};
@@ -156,10 +156,13 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0)
     // that don't match, including the inverted bitmaps.
     import dtiv.bitmaps;
 
+    immutable Character[]* currPatterns =
+        useSkew ? &allBoxPatterns : &boxPatterns;
+
     int best_diff = 8;
     Character bestChr = {pattern: 0x0000ffff, codePoint: 0x2584};
 
-    foreach(ref chr; boxPatterns)
+    foreach(ref chr; *currPatterns)
     {
         uint pattern = chr.pattern;
 
@@ -235,7 +238,8 @@ void main()
         FLAG_FG = 1,
         FLAG_BG = 2,
         FLAG_MODE_256 = 4,
-        FLAG_24BIT = 8,
+        //~ FLAG_24BIT = 8,
+        FLAG_NOT_USE_SKEW = 8,
         FLAG_NOOPT = 16
     }
 
@@ -300,7 +304,7 @@ void main()
             {
                 CharData charData = flags & FLAG_NOOPT
                     ? getCharData(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
-                    : getCharData(&_getPixel, x, y);
+                    : getCharData(&_getPixel, !(flags & FLAG_NOT_USE_SKEW), x, y);
 
                 emit_color(flags | FLAG_BG, charData.bgColor);
                 emit_color(flags | FLAG_FG, charData.fgColor);
