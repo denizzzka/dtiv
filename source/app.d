@@ -135,9 +135,9 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
     uint fg_count;
     uint bg_count;
 
-    for (int y = 0; y < 8; y++)
+    for (ubyte y = 0; y < 8; y++)
     {
-        for (int x = 0; x < 4; x++)
+        for (ubyte x = 0; x < 4; x++)
         {
             if (pattern & mask)
             {
@@ -171,8 +171,8 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     Color max;
 
     // Determine the minimum and maximum value for each color channel
-    for (int y = 0; y < 8; y++)
-        for (int x = 0; x < 4; x++)
+    for (ubyte y = 0; y < 8; y++)
+        for (ubyte x = 0; x < 4; x++)
             for (ubyte i = 0; i < 3; i++)
             {
                 static import cmp = std.algorithm.comparison;
@@ -202,7 +202,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     // Compute a bitmap using the given split and sum the color values for both buckets.
     uint bits = 0;
 
-    for (int y = 0; y < 8; y++)
+    for (ubyte y = 0; y < 8; y++)
     {
         for (ubyte x = 0; x < 4; x++)
         {
