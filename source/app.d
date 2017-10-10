@@ -150,7 +150,7 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
                 bg_count++;
             }
 
-            mask = mask >> 1;
+            mask = mask >>> 1;
         }
     }
 
@@ -220,7 +220,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     immutable Character[]* currPatterns =
         useSkew ? &allBoxPatterns : &boxPatterns;
 
-    int best_diff = 8;
+    uint best_diff = 8;
     Character bestChr = {pattern: 0x0000ffff, codePoint: 0x2584};
 
     foreach(ref chr; *currPatterns)
@@ -238,7 +238,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
                 best_diff = diff;
 
                 bestChr.codePoint = chr.codePoint;
-                bestChr.pattern = pattern;
+                bestChr.pattern = chr.pattern;
             }
 
             pattern = ~pattern;
