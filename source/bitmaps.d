@@ -79,8 +79,7 @@ immutable Character[] boxPatterns =
 
     /// Geometrical shapes. Tricky because some of them are too wide.
     {0x00066000, 0x25aa}, // Black small square
-]
-;
+];
 
 /// Also geometrical shapes. Tricky because some of them are too wide.
 private immutable Character[] shapes =
