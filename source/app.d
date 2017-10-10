@@ -68,7 +68,7 @@ struct CharData
 }
 
 /// Return a CharData struct with the given code point and corresponding averag fg and bg colors.
-CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, ushort codepoint, uint pattern)
+CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wchar codepoint, uint pattern)
 {
     CharData result;
     result.codePoint = codepoint;
@@ -163,7 +163,6 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0)
     int best_diff = 8;
     Character bestChr = {pattern: 0x0000ffff, codePoint: 0x2584};
 
-    //~ for (int i = 0; boxPatterns[i].codePoint != 0; i += 2)
     foreach(ref chr; boxPatterns)
     {
         uint pattern = chr.pattern;
