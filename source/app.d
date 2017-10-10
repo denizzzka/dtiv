@@ -80,20 +80,16 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wcha
     {
         for (int x = 0; x < 4; x++)
         {
-            Color avg;
-
             if (pattern & mask)
             {
-                avg = ret.fgColor;
+                ret.fgColor += getPixel(x0 + x, y0 + y);
                 fg_count++;
             }
             else
             {
-                avg = ret.bgColor;
+                ret.bgColor += getPixel(x0 + x, y0 + y);
                 bg_count++;
             }
-
-            avg += getPixel(x0 + x, y0 + y);
 
             mask = mask >> 1;
         }
