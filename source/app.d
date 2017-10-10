@@ -167,8 +167,8 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
 /// Find the best character and colors for a 4x8 part of the image at the given position
 CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0, int y0)
 {
-    Color min = {255, 255, 255};
-    Color max = {0, 0, 0};
+    Color min = {r: 255, g: 255, b: 255};
+    Color max;
 
     // Determine the minimum and maximum value for each color channel
     for (int y = 0; y < 8; y++)
@@ -187,9 +187,11 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     int bestSplit = 0;
     for (ubyte i = 0; i < 3; i++)
     {
-        if (max[i] - min[i] > bestSplit)
+        auto diff = max[i] - min[i];
+
+        if (diff > bestSplit)
         {
-            bestSplit = max[i] - min[i];
+            bestSplit = diff;
             splitIndex = i;
         }
     }
@@ -358,7 +360,7 @@ void main(string[] args)
 
     void emit_image(T)(in T image)
     {
-        const int flags = 0;
+        const int flags = FLAG_NOT_USE_SKEW;
 
         Pixel _getPixel(int x, int y)
         {
