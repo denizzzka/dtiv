@@ -193,7 +193,7 @@ void main()
     import std.stdio;
     import imageformats;
 
-    IFImage im3 = read_image("test/lena.jpg", ColFmt.RGB);
+    IFImage im3 = read_image("test/lena_tiny.jpg", ColFmt.RGB);
 
     const (Pixel) getPixel(in IFImage img, int x, int y)
     {
@@ -222,7 +222,6 @@ void main()
         return result;
     }
 
-    import std.ascii: newline;
     import std.stdio;
 
     auto sqrt(int i)
@@ -345,7 +344,7 @@ void main()
                 emitCodepoint(charData.codePoint);
             }
 
-            writeln("\x1b[0m"~newline);
+            writeln("\x1b[0m");
         }
     }
 
