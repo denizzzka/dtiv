@@ -192,13 +192,16 @@ void main()
 
     const (Pixel) getPixel(in IFImage img, int x, int y)
     {
-        const idx = y * img.w + x;
+        assert (x >= 0);
+        assert (y >= 0);
+
+        const idx = (y * img.w + x) * Pixel.arr.length;
 
         assert(idx >= 0);
         assert(idx < img.pixels.length);
 
         Pixel ret;
-        ret.arr = img.pixels[idx .. idx + 3];
+        ret.arr = img.pixels[idx .. idx + Pixel.arr.length];
 
         return ret;
     }
@@ -284,7 +287,7 @@ void main()
 
     void emit_image(in IFImage image)
     {
-        const int flags = FLAG_NOOPT;
+        const int flags = 0;
 
         Pixel _getPixel(int x, int y)
         {
