@@ -186,12 +186,12 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     return getAverageColor(getPixel, x0, y0, bestChr.codePoint, bestChr.pattern);
 }
 
-void main()
+void main(string[] args)
 {
     import std.stdio;
     import imageformats;
 
-    IFImage im3 = read_image("test/lena_tiny.jpg", ColFmt.RGB);
+    IFImage im3 = read_image(args[1], ColFmt.RGB);
 
     const (Pixel) getPixel(in IFImage img, int x, int y)
     {
