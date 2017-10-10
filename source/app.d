@@ -64,7 +64,7 @@ struct CharData
 {
     Color fgColor;
     Color bgColor;
-    ushort codePoint;
+    wchar codePoint;
 }
 
 /// Return a CharData struct with the given code point and corresponding averag fg and bg colors.
@@ -287,41 +287,6 @@ void main()
         write(bg ? "\x1B[48;5;" : "\u001B[38;5;", color_index, "m");
     }
 
-    void emitCodepoint(ushort codepoint)
-    {
-        void write(ushort c)
-        {
-            write(cast(char) c);
-        }
-
-        if (codepoint < 128)
-        {
-            codepoint.write;
-        }
-        else if (codepoint < 0x7ff)
-        {
-            ((0xc0 | (codepoint >> 6))).write;
-            (0x80 | (codepoint & 0x3f)).write;
-        }
-        else if (codepoint < 0xffff)
-        {
-            (0xe0 | (codepoint >> 12)).write;
-            (0x80 | ((codepoint >> 6) & 0x3f)).write;
-            (0x80 | (codepoint & 0x3f)).write;
-        }
-        else if (codepoint < 0x10ffff)
-        {
-            (0xf0 | (codepoint >> 18)).write;
-            (0x80 | ((codepoint >> 12) & 0x3f)).write;
-            (0x80 | ((codepoint >> 6) & 0x3f)).write;
-            (0x80 | (codepoint & 0x3f)).write;
-        }
-        else
-        {
-            std.stdio.write("ERROR");
-        }
-    }
-
     void emit_image(in IFImage image)
     {
         const int flags = 0;
@@ -339,9 +304,9 @@ void main()
                     ? getCharData(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
                     : getCharData(&_getPixel, x, y);
 
-                emit_color(flags | FLAG_BG, charData.bgColor);
-                emit_color(flags | FLAG_FG, charData.fgColor);
-                emitCodepoint(charData.codePoint);
+                //~ emit_color(flags | FLAG_BG, charData.bgColor);
+                //~ emit_color(flags | FLAG_FG, charData.fgColor);
+                std.stdio.write(charData.codePoint);
             }
 
             writeln("\x1b[0m");

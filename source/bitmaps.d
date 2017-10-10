@@ -3,7 +3,7 @@ module dtiv.bitmaps;
 struct Character
 {
     uint pattern;
-    ushort codePoint;
+    wchar codePoint;
 }
 
 immutable Character[] boxPatterns =
