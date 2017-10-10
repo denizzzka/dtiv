@@ -8,7 +8,7 @@ struct Character
 
 immutable Character[] boxPatterns =
 [
-    {0x00000000, 0x00a0},
+    {0x00000000, 0x00a0}, // no-break space
 
     // Block graphics
     {0x0000000f, 0x2581}, // lower 1/8

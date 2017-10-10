@@ -92,8 +92,8 @@ struct IFImgWrapper
 
 struct RawImgWrapper
 {
-    int w = 224;
-    int h = 224;
+    int w = 32;
+    int h = 32;
     private ubyte[] pixels;
 
     this(string filename)
@@ -231,7 +231,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
         {
             import core.bitop;
 
-            int diff = popcnt(chr.pattern ^ bits);
+            int diff = popcnt(pattern ^ bits);
 
             if (diff < best_diff)
             {
