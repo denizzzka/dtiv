@@ -68,7 +68,7 @@ struct CharData
 }
 
 /// Return a CharData struct with the given code point and corresponding averag fg and bg colors.
-CharData getCharData(Pixel delegate(int x, int y) getPixel, int x0, int y0, wchar codepoint, uint pattern)
+CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, wchar codepoint, uint pattern)
 {
     CharData ret;
     ret.codePoint = codepoint;
@@ -183,7 +183,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
         }
     }
 
-    return getCharData(getPixel, x0, y0, bestChr.codePoint, bestChr.pattern);
+    return getAverageColor(getPixel, x0, y0, bestChr.codePoint, bestChr.pattern);
 }
 
 void main()
@@ -303,7 +303,7 @@ void main()
             for (int x = 0; x < image.w - 4; x += 4)
             {
                 CharData charData = flags & FLAG_NOOPT
-                    ? getCharData(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
+                    ? getAverageColor(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
                     : getCharData(&_getPixel, !(flags & FLAG_NOT_USE_SKEW), x, y);
 
                 emit_color(flags | FLAG_BG, charData.bgColor);
