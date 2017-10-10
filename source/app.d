@@ -212,26 +212,32 @@ void main(string[] args)
 
     int best_index(int value, in ubyte[] data)
     {
-        import std.math;
+        int best_diff = int.max;
+        size_t ret;
 
-        int best_diff = abs(data[0] - value);
-        int result = 0;
+        foreach(i, d; data)
+        {
+            import std.math: abs;
 
-        for (int i = 1; i < data.length; i++)
-            if (abs(data[i] - value) < best_diff)
-                result = i;
+            int tmp = abs(value - data[0]);
 
-        return result;
+            if(tmp < best_diff)
+            {
+                ret = i;
+                best_diff = tmp;
+            }
+        }
+
+        import std.conv: to;
+
+        return ret.to!int;
     }
 
     import std.stdio;
 
-    auto sqrt(int i)
+    auto pow2(int i)
     {
-        import std.conv: to;
-        static import std.math;
-
-        return std.math.sqrt(i.to!float);
+        return i * i;
     }
 
     enum
@@ -271,14 +277,15 @@ void main(string[] args)
 
         static import std.math;
         import std.conv: to;
-        int gray = std.math.round(0.2989f * color.r + 0.5870f * color.g + 0.1140f * color.b).to!int;
+        //~ int gray = std.math.round(0.2989f * color.r + 0.5870f * color.g + 0.1140f * color.b).to!int;
+        int gray = std.math.round(color.r * 0.2989f + color.g * 0.5870f + color.b * 0.1140f).to!int;
 
         int gri = best_index(gray, GRAYSCALE_STEPS);
         int grq = GRAYSCALE_STEPS[gri];
 
         int color_index;
-        if (0.3 * sqrt(rq-color.r) + 0.59 * sqrt(gq-color.g) + 0.11 * sqrt(bq-color.b) <
-        0.3 * sqrt(grq-color.r) + 0.59 * sqrt(grq-color.g) + 0.11 * sqrt(grq-color.b))
+        if (0.3 * pow2(rq-color.r) + 0.59 * pow2(gq-color.g) + 0.11 * pow2(bq-color.b) <
+        0.3 * pow2(grq-color.r) + 0.59 * pow2(grq-color.g) + 0.11 * pow2(grq-color.b))
         {
             color_index = 16 + 36 * ri + 6 * gi + bi;
         }
@@ -310,6 +317,7 @@ void main(string[] args)
                 emit_color(flags | FLAG_BG, charData.bgColor);
                 emit_color(flags | FLAG_FG, charData.fgColor);
                 std.stdio.write(charData.codePoint);
+                //~ emitCodepoint(charData.codePoint);
             }
 
             writeln("\x1b[0m");
@@ -317,4 +325,32 @@ void main(string[] args)
     }
 
     emit_image(im3);
+}
+
+void emitCodepoint(wchar codepoint)
+{
+    import std.stdio: wr = write;
+
+    void write(T)(T cpoint) @property
+    {
+        wr(cast(char) cpoint);
+    }
+
+  if (codepoint < 128) {
+    codepoint.wr;
+  } else if (codepoint < 0x7ff) {
+    write(0xc0 | (codepoint >> 6));
+    write(0x80 | (codepoint & 0x3f));
+  } else if (codepoint < 0xffff) {
+    write(0xe0 | (codepoint >> 12));
+    write(0x80 | ((codepoint >> 6) & 0x3f));
+    write(0x80 | (codepoint & 0x3f));
+  } else if (codepoint < 0x10ffff) {
+    write(0xf0 | (codepoint >> 18));
+    write(0x80 | ((codepoint >> 12) & 0x3f));
+    write(0x80 | ((codepoint >> 6) & 0x3f));
+    write(0x80 | (codepoint & 0x3f));
+  } else {
+    "ERROR".wr;
+  }
 }
