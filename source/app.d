@@ -60,6 +60,35 @@ struct Color
     }
 }
 
+struct IFImgWrapper
+{
+    import imageformats;
+
+    IFImage img;
+    alias img this;
+
+    this(string filename)
+    {
+        img = read_image(filename, ColFmt.RGB);
+    }
+
+    Pixel getPixel(int x, int y)
+    {
+        assert (x >= 0);
+        assert (y >= 0);
+
+        const idx = (y * img.w + x) * Pixel.arr.length;
+
+        assert(idx >= 0);
+        assert(idx < img.pixels.length);
+
+        Pixel ret;
+        ret.arr = img.pixels[idx .. idx + Pixel.arr.length];
+
+        return ret;
+    }
+}
+
 struct CharData
 {
     Color fgColor;
@@ -190,11 +219,10 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
 void main(string[] args)
 {
     import std.stdio;
-    import imageformats;
 
-    IFImage im3 = read_image(args[1], ColFmt.RGB);
+    auto im3 = IFImgWrapper(args[1]);
 
-    const (Pixel) getPixel(in IFImage img, int x, int y)
+    const (Pixel) getPixel(T)(in T img, int x, int y)
     {
         assert (x >= 0);
         assert (y >= 0);
@@ -297,7 +325,7 @@ void main(string[] args)
         write(bg ? "\x1B[48;5;" : "\u001B[38;5;", color_index, "m");
     }
 
-    void emit_image(in IFImage image)
+    void emit_image(T)(in T image)
     {
         const int flags = 0;
 
