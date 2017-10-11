@@ -1,6 +1,6 @@
 module dtiv.braille;
 
-package:
+private:
 
 /*
  * Dots:
@@ -38,7 +38,7 @@ immutable Dot[] dots =
     {0x0000_0010, 0x80}, // closest to bottom right dot
 ];
 
-struct BraillePatternAccum
+package struct BraillePatternAccum
 {
     private uint _pattern;
     private ubyte currChar;
