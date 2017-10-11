@@ -10,7 +10,7 @@ void main(string[] args)
     auto img = IFImgWrapper(args[1]);
     //~ auto img = RawImgWrapper(args[1]);
 
-    emit_image(img);
+    emit_image(img, 0);
 }
 
 struct IFImgWrapper

@@ -3,10 +3,8 @@ module dtiv.ansi;
 import dtiv.lib;
 import std.stdio;
 
-void emit_image(T)(in T image)
+void emit_image(T)(in T image, int flags)
 {
-    const int flags = 0;
-
     for (int y = 0; y < image.h - 8; y += 8)
     {
         emit_row(image, flags, y);
