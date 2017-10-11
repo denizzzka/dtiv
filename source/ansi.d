@@ -9,16 +9,20 @@ void emit_image(T)(in T image)
 
     for (int y = 0; y < image.h - 8; y += 8)
     {
-        for (int x = 0; x < image.w - 4; x += 4)
-        {
-            CharData charData = getChar(&image.getPixel, flags, x, y);
-
-            emit_color(flags | FLAG_BG, charData.bgColor);
-            emit_color(flags | FLAG_FG, charData.fgColor);
-            write(charData.codePoint);
-        }
-
+        emit_row(image, flags, y);
         writeln("\x1b[0m");
+    }
+}
+
+void emit_row(T)(in T image, int flags, int y)
+{
+    for (int x = 0; x < image.w - 4; x += 4)
+    {
+        CharData charData = getChar(&image.getPixel, flags, x, y);
+
+        emit_color(flags | FLAG_BG, charData.bgColor);
+        emit_color(flags | FLAG_FG, charData.fgColor);
+        write(charData.codePoint);
     }
 }
 
