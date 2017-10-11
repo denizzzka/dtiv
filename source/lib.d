@@ -11,6 +11,16 @@ enum
     FLAG_NOT_USE_BRAILLE = 32
 }
 
+int calcWidth(T)(in T img) pure
+{
+    return img.w / 4;
+}
+
+int calcHeight(T)(in T img) pure
+{
+    return img.h / 8;
+}
+
 struct Pixel
 {
     union
