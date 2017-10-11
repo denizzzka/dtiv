@@ -28,20 +28,21 @@ struct Pixel
     alias arr this;
 }
 
-Pixel getPixel(T)(in T image)
+CharData getChar(Pixel delegate(int x, int y) getPixel, int flags, int x, int y)
 {
-    CharData charData = flags & FLAG_NOOPT
-        ? getAverageColor(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
-        : getCharData(&_getPixel, flags, x, y);
-
-    emit_color(flags | FLAG_BG, charData.bgColor);
-    emit_color(flags | FLAG_FG, charData.fgColor);
-    std.stdio.write(charData.codePoint);
+    return flags & FLAG_NOOPT
+        ? getAverageColor(getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
+        : getCharData(getPixel, flags, x, y);
 }
 
-private:
+struct CharData
+{
+    Color fgColor;
+    Color bgColor;
+    wchar codePoint;
+}
 
-public struct Color
+struct Color
 {
     union
     {
@@ -100,13 +101,7 @@ public struct Color
     }
 }
 
-public
-struct CharData
-{
-    Color fgColor;
-    Color bgColor;
-    wchar codePoint;
-}
+private:
 
 /// Return a CharData struct with the given code point and corresponding averag fg and bg colors.
 public

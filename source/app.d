@@ -149,9 +149,7 @@ void main(string[] args)
         {
             for (int x = 0; x < image.w - 4; x += 4)
             {
-                CharData charData = flags & FLAG_NOOPT
-                    ? getAverageColor(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
-                    : getCharData(&_getPixel, flags, x, y);
+                CharData charData = getChar(&_getPixel, flags, x, y);
 
                 emit_color(flags | FLAG_BG, charData.bgColor);
                 emit_color(flags | FLAG_FG, charData.fgColor);
