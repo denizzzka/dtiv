@@ -5,12 +5,37 @@ import dtiv.lib;
 void main(string[] args)
 {
     import dtiv.ansi;
-    import std.stdio;
+    import std.getopt;
 
-    auto img = IFImgWrapper(args[1]);
-    //~ auto img = RawImgWrapper(args[1]);
+    bool noBlocks;
+    bool colors256;
+    bool disableShapes;
+    bool disableBraille;
 
-    emit_image(img, 0);
+    auto opts = getopt(
+        args,
+        "noblocks|0", "No block character adjustment, always use top half block char.", &noBlocks,
+        "256", "Use 256 color mode.", &colors256,
+        "noshapes", "Disable usage of triangle shapes.", &disableShapes,
+        "nobraille", "Disable usage of triangle shapes.", &disableBraille,
+    );
+
+    if(opts.helpWanted)
+    {
+        defaultGetoptPrinter("Options:", opts.options);
+        return;
+    }
+
+    int flags;
+
+    if(noBlocks) flags |= FLAG_NOOPT;
+    if(colors256) flags |= FLAG_MODE_256;
+    if(disableShapes) flags |= FLAG_NOT_USE_SKEW;
+    if(disableBraille) flags |= FLAG_NOT_USE_BRAILLE;
+
+    auto img = IFImgWrapper(args[$-1]);
+
+    emit_image(img, flags);
 }
 
 struct IFImgWrapper
