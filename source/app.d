@@ -2,6 +2,17 @@ module dtiv.main;
 
 import dtiv.lib;
 
+void main(string[] args)
+{
+    import dtiv.ansi;
+    import std.stdio;
+
+    auto img = IFImgWrapper(args[1]);
+    //~ auto img = RawImgWrapper(args[1]);
+
+    emit_image(img);
+}
+
 struct IFImgWrapper
 {
     import imageformats;
@@ -60,15 +71,4 @@ struct RawImgWrapper
 
         return ret;
     }
-}
-
-void main(string[] args)
-{
-    import dtiv.ansi;
-    import std.stdio;
-
-    auto im3 = IFImgWrapper(args[1]);
-    //~ auto im3 = RawImgWrapper(args[1]);
-
-    emit_image(im3);
 }
