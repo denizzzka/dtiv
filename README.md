@@ -5,6 +5,8 @@ Uses unicode symbols to display images.
 
 ## Usage:
 ```
+$ dub fetch dtiv
+$ dub run dtiv -- ~/Dev/dtiv/test/Murzik.jpg
 
 ```
 
