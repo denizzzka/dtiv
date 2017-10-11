@@ -11,11 +11,13 @@ enum
     FLAG_NOT_USE_BRAILLE = 32
 }
 
+/// Get width in chars
 int calcWidth(T)(in T img) pure
 {
     return img.w / 4;
 }
 
+/// Get height in chars
 int calcHeight(T)(in T img) pure
 {
     return img.h / 8;
