@@ -1,3 +1,5 @@
+module dtiv.main;
+
 struct Pixel
 {
     union
@@ -239,6 +241,32 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
 
                 bestChr.codePoint = chr.codePoint;
                 bestChr.pattern = chr.pattern;
+            }
+
+            pattern = ~pattern;
+        }
+    }
+
+    // Braile patterns check
+    {
+        import dtiv.braille;
+
+        BraillePatternAccum acc;
+        acc.addPattern(bits);
+        uint pattern = acc.pattern;
+
+        for (ubyte j = 0; j < 2; j++) // twice for checking inverted pattern too
+        {
+            import core.bitop;
+
+            int diff = popcnt(pattern ^ bits);
+
+            if (diff < best_diff)
+            {
+                best_diff = diff;
+
+                bestChr.codePoint = acc.codePoint;
+                bestChr.pattern = pattern;
             }
 
             pattern = ~pattern;
