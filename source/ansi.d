@@ -81,3 +81,26 @@ immutable ubyte[24] GRAYSCALE_STEPS =
   0x08, 0x12, 0x1c, 0x26, 0x30, 0x3a, 0x44, 0x4e, 0x58, 0x62, 0x6c, 0x76,
   0x80, 0x8a, 0x94, 0x9e, 0xa8, 0xb2, 0xbc, 0xc6, 0xd0, 0xda, 0xe4, 0xee
 ];
+
+int best_index(int value, in ubyte[] data)
+{
+    int best_diff = int.max;
+    size_t ret;
+
+    foreach(i, d; data)
+    {
+        import std.math: abs;
+
+        int tmp = abs(value - data[0]);
+
+        if(tmp < best_diff)
+        {
+            ret = i;
+            best_diff = tmp;
+        }
+    }
+
+    import std.conv: to;
+
+    return ret.to!int; //TODO: remove "to"
+}

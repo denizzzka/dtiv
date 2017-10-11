@@ -114,7 +114,6 @@ struct Color
 private:
 
 /// Return a CharData struct with the given code point and corresponding averag fg and bg colors.
-public
 CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, wchar codepoint, uint pattern)
 {
     CharData ret;
@@ -153,7 +152,6 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
 }
 
 /// Find the best character and colors for a 4x8 part of the image at the given position
-public
 CharData getCharData(Pixel delegate(int x, int y) getPixel, int flags, int x0, int y0)
 {
     Color min = {r: 255, g: 255, b: 255};
@@ -207,7 +205,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int flags, int x0, i
     import dtiv.bitmaps;
 
     immutable Character[]* currPatterns =
-        flags & FLAG_NOT_USE_SKEW ? &allBoxPatterns : &boxPatterns;
+        (flags & FLAG_NOT_USE_SKEW) ? &boxPatterns : &allBoxPatterns;
 
     uint best_diff = 8;
     Character bestChr = {pattern: 0x0000ffff, codePoint: 0x2584};
@@ -262,28 +260,4 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, int flags, int x0, i
     }
 
     return getAverageColor(getPixel, x0, y0, bestChr.codePoint, bestChr.pattern);
-}
-
-public
-int best_index(int value, in ubyte[] data)
-{
-    int best_diff = int.max;
-    size_t ret;
-
-    foreach(i, d; data)
-    {
-        import std.math: abs;
-
-        int tmp = abs(value - data[0]);
-
-        if(tmp < best_diff)
-        {
-            ret = i;
-            best_diff = tmp;
-        }
-    }
-
-    import std.conv: to;
-
-    return ret.to!int; //TODO: remove "to"
 }
