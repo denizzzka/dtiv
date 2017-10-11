@@ -3,5 +3,7 @@
 
 Uses unicode symbols to display images.
 
+[Demo](screenshot01.png)
+
 Based on Stefan Haustein code:
 https://github.com/stefanhaustein/TerminalImageViewer
