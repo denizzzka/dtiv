@@ -28,14 +28,14 @@ struct Dot
 
 immutable Dot[] dots =
 [
-    {0xc000_0000, 0x01}, // top left dot
-    {0x00c0_0000, 0x02},
-    {0x0000_c000, 0x04},
-    {0x0000_00c0, 0x40}, // closest to bottom left dot
-    {0x3000_0000, 0x08}, // top right dot
-    {0x0030_0000, 0x10},
-    {0x0000_3000, 0x20},
-    {0x0000_0030, 0x80}, // closest to bottom right dot
+    {0x4000_0000, 0x01}, // top left dot
+    {0x0040_0000, 0x02},
+    {0x0000_4000, 0x04},
+    {0x0000_0040, 0x40}, // closest to bottom left dot
+    {0x1000_0000, 0x08}, // top right dot
+    {0x0010_0000, 0x10},
+    {0x0000_1000, 0x20},
+    {0x0000_0010, 0x80}, // closest to bottom right dot
 ];
 
 struct BraillePatternAccum

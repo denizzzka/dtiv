@@ -1,5 +1,16 @@
 module dtiv.main;
 
+enum
+{
+    FLAG_FG = 1,
+    FLAG_BG = 2,
+    FLAG_MODE_256 = 4,
+    //~ FLAG_24BIT = 8,
+    FLAG_NOT_USE_SKEW = 8,
+    FLAG_NOOPT = 16,
+    FLAG_NOT_USE_BRAILLE = 32
+}
+
 struct Pixel
 {
     union
@@ -167,7 +178,7 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
 }
 
 /// Find the best character and colors for a 4x8 part of the image at the given position
-CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0, int y0)
+CharData getCharData(Pixel delegate(int x, int y) getPixel, int flags, int x0, int y0)
 {
     Color min = {r: 255, g: 255, b: 255};
     Color max;
@@ -220,7 +231,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     import dtiv.bitmaps;
 
     immutable Character[]* currPatterns =
-        useSkew ? &allBoxPatterns : &boxPatterns;
+        flags & FLAG_NOT_USE_SKEW ? &allBoxPatterns : &boxPatterns;
 
     uint best_diff = 8;
     Character bestChr = {pattern: 0x0000ffff, codePoint: 0x2584};
@@ -248,6 +259,7 @@ CharData getCharData(Pixel delegate(int x, int y) getPixel, bool useSkew, int x0
     }
 
     // Braile patterns check
+    if(!(flags & FLAG_NOT_USE_BRAILLE))
     {
         import dtiv.braille;
 
@@ -329,16 +341,6 @@ void main(string[] args)
         return i * i;
     }
 
-    enum
-    {
-        FLAG_FG = 1,
-        FLAG_BG = 2,
-        FLAG_MODE_256 = 4,
-        //~ FLAG_24BIT = 8,
-        FLAG_NOT_USE_SKEW = 8,
-        FLAG_NOOPT = 16
-    }
-
     immutable ubyte[6] COLOR_STEPS = [0, 0x5f, 0x87, 0xaf, 0xd7, 0xff];
     immutable ubyte[24] GRAYSCALE_STEPS = [
       0x08, 0x12, 0x1c, 0x26, 0x30, 0x3a, 0x44, 0x4e, 0x58, 0x62, 0x6c, 0x76,
@@ -400,7 +402,7 @@ void main(string[] args)
             {
                 CharData charData = flags & FLAG_NOOPT
                     ? getAverageColor(&_getPixel, x, y, cast(ushort) 0x2584, cast(uint) 0x0000ffff)
-                    : getCharData(&_getPixel, !(flags & FLAG_NOT_USE_SKEW), x, y);
+                    : getCharData(&_getPixel, flags, x, y);
 
                 emit_color(flags | FLAG_BG, charData.bgColor);
                 emit_color(flags | FLAG_FG, charData.fgColor);
