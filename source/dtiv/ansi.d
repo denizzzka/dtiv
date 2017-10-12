@@ -24,7 +24,7 @@ void emit_row(T)(in T image, int flags, int y)
     }
 }
 
-void emit_color(int flags, Color color)
+void emit_color(int flags, in Color color)
 {
     bool bg = (flags & FLAG_BG) != 0;
 
@@ -76,8 +76,13 @@ int best_index(int value, in ubyte[] data)
     return ret.to!int; //TODO: remove "to"
 }
 
-ubyte colorToXTermPaletteIndex(Color color)
+ubyte colorToXTermPaletteIndex(in Color color)
 {
+    import std.experimental.color;
+    import std.experimental.normint;
+
+    auto srgb = RGB8(cast(ubyte) color.r, cast(ubyte) color.g, cast(ubyte) color.b);
+
 	if(color.r == color.g && color.g == color.b)
     {
 		if(color.r == 0) return 0;
@@ -92,9 +97,9 @@ ubyte colorToXTermPaletteIndex(Color color)
 	// so just multiplying will give something good enough
 
 	// will give something between 0 and 5, with some rounding
-	auto r = (cast(int) color.r - 35) / 40;
-	auto g = (cast(int) color.g - 35) / 40;
-	auto b = (cast(int) color.b - 35) / 40;
+	auto r = (color.r - 35) / 40;
+	auto g = (color.g - 35) / 40;
+	auto b = (color.b - 35) / 40;
 
 	return cast(ubyte) (16 + b + g*6 + r*36);
 }
