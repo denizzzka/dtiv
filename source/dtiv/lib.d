@@ -143,10 +143,16 @@ CharData getAverageColor(Pixel delegate(int x, int y) getPixel, int x0, int y0, 
 
     // Calculate the average color value for each bucket
     if (bg_count != 0)
+    {
         ret.bgColor /= bg_count;
+        ret.bgColor.clamp2byte(); // fits value into 0-255
+    }
 
     if (fg_count != 0)
+    {
         ret.fgColor /= fg_count;
+        ret.fgColor.clamp2byte();
+    }
 
     return ret;
 }

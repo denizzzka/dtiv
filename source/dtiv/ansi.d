@@ -26,8 +26,6 @@ void emit_row(T)(in T image, int flags, int y)
 
 void emit_color(int flags, Color color)
 {
-    color.clamp2byte();
-
     bool bg = (flags & FLAG_BG) != 0;
 
     if ((flags & FLAG_MODE_256) == 0)
