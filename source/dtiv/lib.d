@@ -90,7 +90,12 @@ struct Color
         return this;
     }
 
-    void clamp2byte() //TODO: remove
+    private static ubyte clamp(int e)
+    {
+        return cast(ubyte)( e < 0 ? 0 : (e > 255 ? 255 : e) );
+    }
+
+    void clamp2byte()
     {
         foreach(ref e; arr)
         {
@@ -98,15 +103,8 @@ struct Color
         }
     }
 
-    static ubyte clamp(int e)
+    Pixel toPixel() const
     {
-        return cast(ubyte)( e < 0 ? 0 : (e > 255 ? 255 : e) );
-    }
-
-    Pixel toPixel()
-    {
-        clamp2byte();
-
         Pixel r = { r: clamp(r), g: clamp(g), b: clamp(b) };
 
         return r;
