@@ -31,38 +31,11 @@ void emit_color(int flags, Color color)
     if ((flags & FLAG_MODE_256) == 0)
     {
         write((bg ? "\x1b[48;2;" : "\x1b[38;2;"), color.r, ';', color.g, ';', color.b, 'm');
-        return;
     }
     else
     {
-        int ri = best_index(color.r, COLOR_STEPS);
-        int gi = best_index(color.g, COLOR_STEPS);
-        int bi = best_index(color.b, COLOR_STEPS);
-
-        int rq = COLOR_STEPS[ri];
-        int gq = COLOR_STEPS[gi];
-        int bq = COLOR_STEPS[bi];
-
-        static import std.math;
-        import std.conv: to;
-        int gray = std.math.round(0.2989f * color.r + 0.5870f * color.g + 0.1140f * color.b).to!int;
-
-        int gri = best_index(gray, GRAYSCALE_STEPS);
-        int grq = GRAYSCALE_STEPS[gri];
-
-        int color_index;
-
-        if (0.3 * pow2(rq-color.r) + 0.59 * pow2(gq-color.g) + 0.11 * pow2(bq-color.b) <
-        0.3 * pow2(grq-color.r) + 0.59 * pow2(grq-color.g) + 0.11 * pow2(grq-color.b))
-        {
-            color_index = 16 + 36 * ri + 6 * gi + bi;
-        }
-        else
-        {
-            color_index = 232 + gri;  // 1..24 -> 232..255
-        }
-
-        write(bg ? "\x1B[48;5;" : "\u001B[38;5;", color_index, "m");
+        ubyte color_index = colorToXTermPaletteIndex(color);
+        write(bg ? "\x1b[48;5;" : "\u001b[38;5;", color_index, "m");
     }
 }
 
@@ -101,4 +74,27 @@ int best_index(int value, in ubyte[] data)
     import std.conv: to;
 
     return ret.to!int; //TODO: remove "to"
+}
+
+ubyte colorToXTermPaletteIndex(Color color)
+{
+	if(color.r == color.g && color.g == color.b)
+    {
+		if(color.r == 0) return 0;
+		if(color.r >= 248) return 15;
+
+		return cast(ubyte) (232 + ((color.r - 8) / 10));
+	}
+
+	// if it isn't grey, it is color
+
+	// the ramp goes blue, green, red, with 6 of each,
+	// so just multiplying will give something good enough
+
+	// will give something between 0 and 5, with some rounding
+	auto r = (cast(int) color.r - 35) / 40;
+	auto g = (cast(int) color.g - 35) / 40;
+	auto b = (cast(int) color.b - 35) / 40;
+
+	return cast(ubyte) (16 + b + g*6 + r*36);
 }

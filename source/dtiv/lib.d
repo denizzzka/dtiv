@@ -5,7 +5,6 @@ enum
     FLAG_FG = 1,
     FLAG_BG = 2,
     FLAG_MODE_256 = 4,
-    //~ FLAG_24BIT = 8,
     FLAG_NOT_USE_SKEW = 8,
     FLAG_NOOPT = 16,
     FLAG_NOT_USE_BRAILLE = 32
