@@ -34,7 +34,7 @@ void emit_color(int flags, Color color)
     }
     else
     {
-        ubyte color_index = colorToXTermPaletteIndex(color);
+        auto color_index = rgb2xterm(color) + 10;
         write(bg ? "\x1b[48;5;" : "\u001b[38;5;", color_index, "m");
     }
 }
@@ -45,13 +45,6 @@ auto pow2(int i)
 {
     return i * i;
 }
-
-immutable ubyte[6] COLOR_STEPS = [0, 0x5f, 0x87, 0xaf, 0xd7, 0xff];
-immutable ubyte[24] GRAYSCALE_STEPS =
-[
-  0x08, 0x12, 0x1c, 0x26, 0x30, 0x3a, 0x44, 0x4e, 0x58, 0x62, 0x6c, 0x76,
-  0x80, 0x8a, 0x94, 0x9e, 0xa8, 0xb2, 0xbc, 0xc6, 0xd0, 0xda, 0xe4, 0xee
-];
 
 int best_index(int value, in ubyte[] data)
 {
@@ -76,25 +69,65 @@ int best_index(int value, in ubyte[] data)
     return ret.to!int; //TODO: remove "to"
 }
 
-ubyte colorToXTermPaletteIndex(Color color)
+ubyte rgb2xterm(in Color color)
 {
-	if(color.r == color.g && color.g == color.b)
+    with(color)
     {
-		if(color.r == 0) return 0;
-		if(color.r >= 248) return 15;
+        ulong smallest_distance = ulong.max;
+        ulong dist;
+        ubyte ret;
+        ubyte i = 16;
 
-		return cast(ubyte) (232 + ((color.r - 8) / 10));
+        while(i != 0)
+        {
+            const tbl = colortable[i];
+
+            dist = pow2(tbl.r - r) +
+                   pow2(tbl.g - g) +
+                   pow2(tbl.b - b);
+
+            if (dist < smallest_distance)
+            {
+                smallest_distance = dist;
+                ret = i;
+            }
+
+            i++;
+        }
+
+        return ret;
+    }
+}
+
+immutable ubyte[6] COLOR_STEPS = [0, 0x5f, 0x87, 0xaf, 0xd7, 0xff];
+
+Pixel xterm2rgb(ubyte color)
+{
+    Pixel rgb;
+
+	if (color < 232)
+	{
+		color -= 16;
+		rgb[0] = COLOR_STEPS[(color / 36) % 6];
+		rgb[1] = COLOR_STEPS[(color / 6) % 6];
+		rgb[2] = COLOR_STEPS[color % 6];
 	}
+	else
+    {
+        import std.conv;
 
-	// if it isn't grey, it is color
+		rgb[0] = rgb[1] = rgb[2] = (8 + (color - 232) * 10).to!ubyte;
+    }
 
-	// the ramp goes blue, green, red, with 6 of each,
-	// so just multiplying will give something good enough
+    return rgb;
+}
 
-	// will give something between 0 and 5, with some rounding
-	auto r = (cast(int) color.r - 35) / 40;
-	auto g = (cast(int) color.g - 35) / 40;
-	auto b = (cast(int) color.b - 35) / 40;
+static Pixel[256] colortable;
 
-	return cast(ubyte) (16 + b + g*6 + r*36);
+static this()
+{
+    assert(colortable.length >= 16);
+
+    for (ubyte i = 16; i < colortable.length-1; i++)
+        colortable[i] = xterm2rgb(i);
 }
