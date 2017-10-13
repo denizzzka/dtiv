@@ -41,11 +41,6 @@ void emit_color(int flags, Color color)
 
 private:
 
-auto pow2(int i)
-{
-    return i * i;
-}
-
 ubyte colorToXTermPaletteIndex(Color color)
 {
 	if(color.r == color.g && color.g == color.b)
